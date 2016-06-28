@@ -11,6 +11,7 @@
 #import <opencv2/highgui/cap_ios.h>
 #import <opencv2/highgui/highgui.hpp>
 #import <opencv2/imgproc/imgproc.hpp>
+#import <opencv2/features2d/features2d.hpp>
 
 using namespace cv;
 
@@ -23,6 +24,9 @@ using namespace cv;
 @end
 
 @implementation ViewController
+{
+    cv::SimpleBlobDetector * blob_detector;
+}
 
 
 
@@ -36,6 +40,11 @@ using namespace cv;
     self.videoCamera.defaultFPS = 30;
     self.videoCamera.grayscaleMode = NO;
     self.videoCamera.delegate = self;
+    
+    // creation
+
+    blob_detector = new SimpleBlobDetector();
+    blob_detector->create("SimpleBlobDetector");
 
 }
 
@@ -76,8 +85,14 @@ using namespace cv;
     dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, cv::Size(5, 5)) );
     erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, cv::Size(5, 5)) );
     
-    // Add blob detector : SimpleBlobDetector !
-    // http://docs.opencv.org/modules/features2d/doc/common_interfaces_of_feature_detectors.html
+    // Blob detection on the image
+    vector<cv::KeyPoint> keypoints;
+    blob_detector->detect(image, keypoints);
+    // extract the x y coordinates of the keypoints:
+    for (int i=0; i<keypoints.size(); i++){
+        float X = keypoints[i].pt.x; // Used to control OSC or MIDI values
+        float Y = keypoints[i].pt.y; // Used to control OSC or MIDI values
+    }
     
     // Detect % of white and black ?
     vector<Mat> channels;
